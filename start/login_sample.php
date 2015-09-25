@@ -1,4 +1,9 @@
 <?php
+
+	// ühenduse loomiseks kasuta
+	require_once("../../config.php");
+	$database = "if15_karilaid";
+	$mysqli = new mysqli($servername, $username, $password, $database);
   // muuutujad errorite jaoks
 	$email_error = "";
 	$password_error = "";
@@ -50,6 +55,17 @@
 			}
 			if(	$create_email_error == "" && $create_password_error == ""){
 				echo "Võib kasutajat luua! Kasutajanimi on ".$create_email." ja parool on ".$create_password;
+				
+				$password_hash = hash("sha512", $create_password);
+				echo "<br>";
+				echo $password_hash;
+				
+				$stmt = $mysqli->prepare("INSERT INTO user_sample(email, password) VALUE(?, ?)");
+				
+				//asendame ? märgid muutujate väärtustega
+				$stmt->bind_param("ss", $create_email, $password_hash);
+				$stmt->execute();
+				$stmt->close();
       }
     } // create if end
 	}
@@ -60,6 +76,7 @@
   	$data = htmlspecialchars($data);
   	return $data;
   }
+  $mysqli->close();
 ?>
 <!DOCTYPE html>
 <html>
